@@ -1,0 +1,1 @@
+A lazy cryptographer has encrypted two passages from a single English-language book using the same same One-time pad. Your assignment is to crack the code, decrypt the passages and identify which book the passages are extracted from. 

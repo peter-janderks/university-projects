@@ -1,0 +1,44 @@
+CHIP ALU {
+    IN
+        x[16], y[16],  // 16-bit inputs
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or x & y (if 0)
+        no; // negate the out output?
+
+    OUT
+        out[16], // 16-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out < 0),  0 otherwise
+
+    PARTS:
+
+    // handles 'zx' and 'nx'
+    Not16(in=x, out=notx);
+    Mux4Way16(a=x,b=false ,c=notx ,d=true ,sel[0]=zx ,sel[1]=nx ,out=newx );
+
+    // handles 'zy' and 'ny'
+    Not16(in=y, out=noty);
+    Mux4Way16(a=y ,b=false ,c=noty ,d=true ,sel[0]=zy ,sel[1]=ny,out=newy );
+
+    // handles 'f'
+    Add16(a=newx, b=newy, out=addedxy);
+    And16(a=newx, b=newy, out=andxy);
+    Mux16(a=andxy, b=addedxy, sel=f, out=fout);
+
+    // handles 'no'
+    Not16(in=fout, out=notfout);
+    Mux16(a=fout, b=notfout, sel=no, out=out, out[0..7]=out7, out[8..15]=out15,\
+ out[15]=negative);
+
+    // handles two status outputs 'zr' and 'ng'
+    Or8Way(in=out7, out=any7);
+    Or8Way(in=out15, out=any15);
+    Or(a=any7, b=any15, out=any);
+    Xor(a=any, b=true, out=zr);
+
+    And(a=negative, b=true, out=ng);
+}
+

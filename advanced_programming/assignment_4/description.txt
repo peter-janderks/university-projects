@@ -1,0 +1,2 @@
+http://nand2tetris.org/02.php
+http://nand2tetris.org/06.php
